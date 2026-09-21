@@ -33,9 +33,6 @@ function connectPipe() {
     pipe = socket;
     log("Connected to Cheezie Engine.");
 
-    for (const [id, item] of pending) {
-      socket.write(JSON.stringify({ id, payload: item.payload }) + "\n");
-    }
   });
 
   socket.on("data", (chunk) => {
