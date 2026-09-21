@@ -13,15 +13,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Package extension
+      - name: Validate extension
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Compress-Archive -Path extension\* -DestinationPath dist\Cheezie-Engine-Extension.zip -Force
+          $required = @(
+            "extension\manifest.json",
+            "extension\background.js",
+            "extension\content.js",
+            "extension\bridge.js"
+          )
+
+          foreach ($file in $required) {
+            if (-not (Test-Path $file)) {
+              throw "Missing extension file: $file"
+            }
+          }
 
       - name: Upload extension
         uses: actions/upload-artifact@v4
         with:
           name: Cheezie-Engine-Extension
-          path: dist/Cheezie-Engine-Extension.zip
+          path: extension/*
           if-no-files-found: error
+          include-hidden-files: false
