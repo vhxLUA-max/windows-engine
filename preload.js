@@ -11,6 +11,5 @@ contextBridge.exposeInMainWorld("cheezie", {
     const listener = (_event, payload) => callback(payload);
     ipcRenderer.on("cheezie-bridge-status", listener);
     return () => ipcRenderer.removeListener("cheezie-bridge-status", listener);
-  },
-  openExtensionFolder: () => ipcRenderer.invoke("open-extension-folder")
+  }
 });
