@@ -3,7 +3,7 @@
   "name": "Cheezie Engine Live Bridge",
   "version": "1.0.0",
   "description": "Reads the current Chess.com position and sends it to Cheezie Engine.",
-  "permissions": ["nativeMessaging"],
+  "permissions": ["nativeMessaging", "scripting"],
   "host_permissions": [
     "https://www.chess.com/*",
     "https://chess.com/*",
@@ -21,16 +21,6 @@
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["bridge.js"],
-      "matches": [
-        "https://www.chess.com/*",
-        "https://chess.com/*",
-        "https://*.chess.com/*"
-      ]
     }
   ],
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtBxLe2BmEE9ClzgoMKZAtys+0Wl1WkGBe0Nwb/Rajyn0INJfJS0mLSSYk2xe0lxt2RUezhjS11pQ1KoSi+qbs2OyHzzpvV3dv+j8RBqRrq2Uxa9t5xCiA3W2Cua0Gn+zj5hy/em9KLoBl95cBXb0O8na6+TIqlEWWdQUtrxly+K/dpUvKc1uGYrcg4kqRl4v1l388qJvUj+Uf9rXOeJrvt3PXBFq7rUYBTYR2jllwPZ47tpFM4wEF/pfBDbZYxe/9Yo1LOOzAhf5OwC1fa01y6aPrqhaxc0KdnswCgio6bhZnWrFgO3kqUEipnPbr3PqTTeBiUT6ICK0yZXIaDkh/wIDAQAB"
