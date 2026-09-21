@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; connect-src 'none'; worker-src blob:; style-src 'self'; img-src 'self' data:;" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cheezie Engine</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <div class="brand">CHEEZIE ENGINE</div>
+        <div class="subtitle">Standalone Windows analyzer</div>
+      </div>
+      <div id="status" class="status">Loading engine…</div>
+    </header>
+
+    <section class="controls">
+      <label class="field fen-field">
+        <span>FEN</span>
+        <input id="fen" type="text" spellcheck="false"
+          value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" />
+      </label>
+
+      <label class="field"><span>Depth</span><input id="depth" type="number" min="1" max="60" value="18" /></label>
+      <label class="field"><span>Lines</span><input id="multipv" type="number" min="1" max="10" value="3" /></label>
+      <label class="field"><span>Threads</span><input id="threads" type="number" min="1" max="64" value="2" /></label>
+      <label class="field"><span>Hash (MB)</span><input id="hash" type="number" min="1" max="4096" value="128" /></label>
+    </section>
+
+    <section class="actions">
+      <button id="analyze" class="primary" disabled>Analyze</button>
+      <button id="stop" disabled>Stop</button>
+      <button id="startpos">Starting position</button>
+      <button id="clear">Clear</button>
+    </section>
+
+    <section class="summary-grid">
+      <div class="card"><div class="label">Best Move</div><div id="bestmove" class="value mono">—</div></div>
+      <div class="card"><div class="label">Evaluation</div><div id="evaluation" class="value mono">—</div></div>
+      <div class="card"><div class="label">Depth</div><div id="current-depth" class="value mono">—</div></div>
+      <div class="card"><div class="label">Nodes</div><div id="nodes" class="value mono">—</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">Principal Variations</div>
+      <div id="lines" class="lines"></div>
+    </section>
+
+    <section class="panel log-panel">
+      <div class="panel-title">Engine Output</div>
+      <pre id="log" class="log"></pre>
+    </section>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>
