@@ -1,0 +1,27 @@
+name: Build Chrome Extension
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-extension:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Package extension
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Compress-Archive -Path extension\* -DestinationPath dist\Cheezie-Engine-Extension.zip -Force
+
+      - name: Upload extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cheezie-Engine-Extension
+          path: dist/Cheezie-Engine-Extension.zip
+          if-no-files-found: error
