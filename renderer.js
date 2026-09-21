@@ -99,12 +99,7 @@
 
   async function loadEngine() {
     try {
-      const response = await fetch("./engine/stockfish11.js");
-      if (!response.ok) throw new Error("Could not load engine payload (" + response.status + ")");
-
-      const code = await response.text();
-      const blob = new Blob([code], { type: "application/javascript" });
-      worker = new Worker(URL.createObjectURL(blob));
+      worker = new Worker(new URL("./engine/stockfish11.js", window.location.href));
 
       worker.onmessage = (event) => {
         const line = typeof event.data === "string" ? event.data : "";
