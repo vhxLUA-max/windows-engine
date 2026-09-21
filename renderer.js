@@ -14,7 +14,6 @@
     stop: document.getElementById("stop"),
     startpos: document.getElementById("startpos"),
     clear: document.getElementById("clear"),
-    extensionFolder: document.getElementById("extension-folder"),
     liveToggle: document.getElementById("live-toggle"),
     status: document.getElementById("status"),
     source: document.getElementById("source"),
@@ -352,16 +351,6 @@
     resetResults();
     el.log.textContent = "";
     el.source.textContent = "Manual";
-  });
-
-  el.extensionFolder.addEventListener("click", async () => {
-    try {
-      await window.cheezie.openExtensionFolder();
-      setStatus("Bridge folder opened");
-    } catch (error) {
-      setStatus("Could not open bridge folder");
-      addLog(String(error));
-    }
   });
 
   window.cheezie.onBridgeStatus((status) => {
