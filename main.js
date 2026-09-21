@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const net = require("net");
@@ -21,7 +21,10 @@ if (isNativeHostInvocation) {
   function logStartup(message) {
     try {
       const logPath = path.join(app.getPath("userData"), "startup.log");
-      fs.appendFileSync(logPath, new Date().toISOString() + " " + message + "\n");
+      fs.appendFileSync(
+        logPath,
+        new Date().toISOString() + " " + message + "\n"
+      );
     } catch {}
   }
 
@@ -183,9 +186,7 @@ if (isNativeHostInvocation) {
       });
 
       mainWindow.webContents.on("did-fail-load", (_event, code, description) => {
-        logStartup(
-          "Page failed to load: " + code + " " + description
-        );
+        logStartup("Page failed to load: " + code + " " + description);
       });
 
       mainWindow.loadFile(path.join(__dirname, "index.html")).catch((error) => {
@@ -208,16 +209,6 @@ if (isNativeHostInvocation) {
     return fs.promises.readFile(enginePath, "utf8");
   });
 
-  ipcMain.handle("open-extension-folder", async () => {
-    const extensionPath = app.isPackaged
-      ? path.join(process.resourcesPath, "extension")
-      : path.join(__dirname, "extension");
-
-    const result = await shell.openPath(extensionPath);
-    if (result) throw new Error(result);
-    return extensionPath;
-  });
-
   process.on("uncaughtException", (error) => {
     logStartup("Uncaught exception: " + error.stack);
   });
@@ -235,6 +226,8 @@ if (isNativeHostInvocation) {
       logStartup("Application ready.");
       createWindow();
 
+      // Register Native Messaging independently of the extension package.
+      // The browser extension can now be distributed and installed separately.
       registerNativeMessagingHost();
       startPipeServer();
 
