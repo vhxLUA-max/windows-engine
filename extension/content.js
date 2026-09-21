@@ -1,22 +1,7 @@
 (() => {
   "use strict";
 
-  let injected = false;
   let lastFen = "";
-
-  function injectBridge() {
-    if (injected) return;
-    injected = true;
-
-    const script = document.createElement("script");
-    script.src = chrome.runtime.getURL("bridge.js");
-    script.async = false;
-
-    const root = document.head || document.documentElement;
-    root.appendChild(script);
-
-    script.addEventListener("load", () => script.remove(), { once: true });
-  }
 
   function requestFen() {
     window.postMessage({ type: "CHEEZIE_GET_FEN" }, "*");
@@ -39,7 +24,9 @@
     });
   });
 
-  injectBridge();
-  requestFen();
+  chrome.runtime.sendMessage({ type: "CHEEZIE_INIT" }, () => {
+    setTimeout(requestFen, 150);
+  });
+
   setInterval(requestFen, 350);
 })();
