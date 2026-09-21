@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Cheezie Engine Live Bridge",
-  "version": "1.0.0",
-  "description": "Reads the current Chess.com position and sends it to Cheezie Engine.",
+  "version": "1.2.0",
+  "description": "Reads the current Chess.com position and sends it to the separately installed Cheezie Engine Windows app.",
   "permissions": ["nativeMessaging", "scripting"],
   "host_permissions": [
     "https://www.chess.com/*",
