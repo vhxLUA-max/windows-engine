@@ -152,7 +152,7 @@
           el.analyze.disabled = false;
           el.stop.disabled = true;
 
-          if (liveMode && queuedFen && queuedFen !== el.fen.value.trim()) {
+          if (liveMode && queuedFen) {
             const nextFen = queuedFen;
             queuedFen = null;
             el.fen.value = nextFen;
