@@ -15,7 +15,10 @@
         <div class="brand">CHEEZIE ENGINE</div>
         <div class="subtitle">Standalone Windows analyzer</div>
       </div>
-      <div id="status" class="status">Loading engine…</div>
+      <div class="header-right">
+        <button id="live-toggle" class="live-toggle">Live: OFF</button>
+        <div id="status" class="status">Loading engine…</div>
+      </div>
     </header>
 
     <section class="controls">
@@ -36,6 +39,7 @@
       <button id="stop" disabled>Stop</button>
       <button id="startpos">Starting position</button>
       <button id="clear">Clear</button>
+      <button id="extension-folder">Open Bridge Folder</button>
     </section>
 
     <section class="summary-grid">
@@ -43,6 +47,7 @@
       <div class="card"><div class="label">Evaluation</div><div id="evaluation" class="value mono">—</div></div>
       <div class="card"><div class="label">Depth</div><div id="current-depth" class="value mono">—</div></div>
       <div class="card"><div class="label">Nodes</div><div id="nodes" class="value mono">—</div></div>
+      <div class="card"><div class="label">Source</div><div id="source" class="value">Manual</div></div>
     </section>
 
     <section class="panel">
