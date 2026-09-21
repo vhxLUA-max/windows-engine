@@ -1,0 +1,35 @@
+{
+  "name": "cheezie-engine-windows",
+  "version": "1.0.0",
+  "description": "Standalone Windows build of Cheezie Engine analysis core.",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^38.1.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.vhxluamax.cheezieengine",
+    "productName": "Cheezie Engine",
+    "artifactName": "Cheezie-Engine-Windows-${version}.${ext}",
+    "files": [
+      "main.js",
+      "index.html",
+      "renderer.js",
+      "styles.css",
+      "engine/stockfish11.js"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    }
+  }
+}
