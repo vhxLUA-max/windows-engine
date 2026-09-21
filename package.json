@@ -1,7 +1,7 @@
 {
   "name": "cheezie-engine-windows",
-  "version": "1.0.0",
-  "description": "Standalone Windows build of Cheezie Engine analysis core.",
+  "version": "1.1.0",
+  "description": "Standalone Windows build of Cheezie Engine with live Chess.com bridge.",
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -18,13 +18,21 @@
   "build": {
     "appId": "com.vhxluamax.cheezieengine",
     "productName": "Cheezie Engine",
-    "artifactName": "Cheezie-Engine-Windows-${version}.${ext}",
+    "artifactName": "Cheezie-Engine-Windows-\u0024{version}.\u0024{ext}",
     "files": [
       "main.js",
+      "preload.js",
+      "native-host.js",
       "index.html",
       "renderer.js",
       "styles.css",
       "engine/stockfish11.js"
+    ],
+    "extraResources": [
+      {
+        "from": "extension",
+        "to": "extension"
+      }
     ],
     "win": {
       "target": [
