@@ -1,6 +1,7 @@
 const HOST_NAME = "com.vhx.cheezie.engine";
 let port = null;
 let reconnectTimer = null;
+const injectedTabs = new Set();
 
 function connect() {
   if (port) return;
@@ -24,7 +25,29 @@ function connect() {
   }
 }
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+async function injectBridge(tabId) {
+  if (injectedTabs.has(tabId)) return;
+
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      world: "MAIN",
+      files: ["bridge.js"]
+    });
+    injectedTabs.add(tabId);
+  } catch {}
+}
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  injectedTabs.delete(tabId);
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === "CHEEZIE_INIT" && sender.tab?.id != null) {
+    injectBridge(sender.tab.id).then(() => sendResponse({ ok: true }));
+    return true;
+  }
+
   if (message?.type !== "CHEEZIE_POSITION") return;
 
   connect();
