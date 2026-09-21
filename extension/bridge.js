@@ -1,6 +1,9 @@
 (() => {
   "use strict";
 
+  if (window.__CHEEZIE_ENGINE_BRIDGE__) return;
+  window.__CHEEZIE_ENGINE_BRIDGE__ = true;
+
   function getGameObject() {
     if (window.game) return window.game;
 
