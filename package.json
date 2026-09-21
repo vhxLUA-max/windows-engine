@@ -1,6 +1,6 @@
 {
   "name": "cheezie-engine-windows",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Standalone Windows build of Cheezie Engine with live Chess.com bridge.",
   "main": "main.js",
   "private": true,
