@@ -10,6 +10,9 @@ body { margin: 0; min-height: 100vh; background: #111318; }
 .header { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 24px; }
 .brand { font-size: 23px; font-weight: 700; letter-spacing: 1.4px; }
 .subtitle { margin-top: 5px; color: #9098a8; font-size: 13px; }
+.header-right { display: flex; align-items: center; gap: 9px; }
+.live-toggle { height: 34px; padding: 0 12px; }
+.live-toggle.active { background: #2f4635; border-color: #477456; }
 .status { border: 1px solid #2a2f39; border-radius: 999px; padding: 7px 12px; font-size: 12px; color: #aab2c0; background: #171a20; }
 .controls { display: grid; grid-template-columns: minmax(280px, 1fr) repeat(4, 110px); gap: 12px; margin-bottom: 14px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
@@ -21,7 +24,7 @@ button { height: 38px; border-radius: 8px; border: 1px solid #2a2f39; background
 button:hover:not(:disabled) { background: #222832; }
 button:disabled { cursor: default; opacity: .45; }
 button.primary { background: #3b4453; border-color: #59657a; }
-.summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
 .card, .panel { border: 1px solid #262b34; background: #16191f; border-radius: 10px; }
 .card { padding: 14px; }
 .value { margin-top: 9px; font-size: 19px; }
