@@ -158,7 +158,9 @@ if (isNativeHostInvocation) {
   });
 
   ipcMain.handle("open-extension-folder", async () => {
-    const extensionPath = path.join(process.resourcesPath, "extension");
+    const extensionPath = app.isPackaged
+      ? path.join(process.resourcesPath, "extension")
+      : path.join(__dirname, "extension");
     await shell.openPath(extensionPath);
     return extensionPath;
   });
