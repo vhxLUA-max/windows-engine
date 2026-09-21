@@ -5,7 +5,10 @@
   "main": "main.js",
   "private": true,
   "scripts": {
+    "prepare-engine": "node scripts/prepare-engine.js",
+    "prestart": "npm run prepare-engine",
     "start": "electron .",
+    "prebuild": "npm run prepare-engine",
     "dist": "electron-builder --win portable"
   },
   "devDependencies": {
