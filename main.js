@@ -8,7 +8,9 @@ const PIPE_NAME = "\\\\.\\pipe\\cheezie-engine-v1";
 const HOST_NAME = "com.vhx.cheezie.engine";
 const EXTENSION_ID = "hkdkilknajblfabfcbdocgndhiajgkdg";
 
-if (process.argv.includes("--native-host")) {
+const isNativeHostInvocation = process.argv.some((arg) => arg.startsWith("chrome-extension://"));
+
+if (isNativeHostInvocation) {
   require("./native-host");
 } else {
   let mainWindow = null;
