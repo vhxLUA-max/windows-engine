@@ -6,7 +6,7 @@ const { execFileSync } = require("child_process");
 
 const PIPE_NAME = "\\\\.\\pipe\\cheezie-engine-v1";
 const HOST_NAME = "com.vhx.cheezie.engine";
-const EXTENSION_ID = "doaapgabnligolnlbphnkfmimdkfjeme";
+const EXTENSION_ID = "hkdkilknajblfabfcbdocgndhiajgkdg";
 
 if (process.argv.includes("--native-host")) {
   require("./native-host");
