@@ -1,7 +1,7 @@
 CHEEZIE ENGINE LIVE BRIDGE
 
 Purpose:
-This extension reads the current Chess.com position and sends its FEN to the Cheezie Engine Windows app.
+This extension reads the current Chess.com position and sends its FEN to the Cheezie Engine Windows app through Native Messaging.
 
 It does not contain Stockfish.
 It does not draw arrows.
