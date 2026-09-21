@@ -1,7 +1,8 @@
 (() => {
   "use strict";
 
-  const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  const START_FEN =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   const el = {
     fen: document.getElementById("fen"),
@@ -13,7 +14,10 @@
     stop: document.getElementById("stop"),
     startpos: document.getElementById("startpos"),
     clear: document.getElementById("clear"),
+    extensionFolder: document.getElementById("extension-folder"),
+    liveToggle: document.getElementById("live-toggle"),
     status: document.getElementById("status"),
+    source: document.getElementById("source"),
     bestmove: document.getElementById("bestmove"),
     evaluation: document.getElementById("evaluation"),
     currentDepth: document.getElementById("current-depth"),
@@ -25,9 +29,14 @@
   let worker = null;
   let initialized = false;
   let analyzing = false;
+  let liveMode = false;
+  let analyzingFen = null;
+  let queuedFen = null;
   let lastInfo = new Map();
 
-  const setStatus = (text) => { el.status.textContent = text; };
+  const setStatus = (text) => {
+    el.status.textContent = text;
+  };
 
   function addLog(line) {
     if (!line) return;
@@ -47,6 +56,7 @@
   function parseInfo(line) {
     const tokens = line.trim().split(/\s+/);
     const result = {};
+
     const depthIndex = tokens.indexOf("depth");
     const multipvIndex = tokens.indexOf("multipv");
     const scoreIndex = tokens.indexOf("score");
@@ -54,7 +64,8 @@
     const nodesIndex = tokens.indexOf("nodes");
 
     result.depth = depthIndex >= 0 ? Number(tokens[depthIndex + 1]) : null;
-    result.multipv = multipvIndex >= 0 ? Number(tokens[multipvIndex + 1]) : 1;
+    result.multipv =
+      multipvIndex >= 0 ? Number(tokens[multipvIndex + 1]) : 1;
     result.pv = pvIndex >= 0 ? tokens.slice(pvIndex + 1) : [];
     result.nodes = nodesIndex >= 0 ? Number(tokens[nodesIndex + 1]) : null;
 
@@ -77,29 +88,36 @@
   }
 
   function renderLines() {
-    const rows = [...lastInfo.entries()].sort((a, b) => a[0] - b[0]).map(([mpv, info]) => {
-      const line = document.createElement("div");
-      line.className = "line";
+    const rows = [...lastInfo.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([mpv, info]) => {
+        const line = document.createElement("div");
+        line.className = "line";
 
-      const no = document.createElement("span");
-      no.textContent = String(mpv);
+        const no = document.createElement("span");
+        no.textContent = String(mpv);
 
-      const score = document.createElement("span");
-      score.textContent = info.score || "—";
+        const score = document.createElement("span");
+        score.textContent = info.score || "—";
 
-      const pv = document.createElement("span");
-      pv.textContent = info.pv.join(" ");
+        const pv = document.createElement("span");
+        pv.textContent = info.pv.join(" ");
 
-      line.append(no, score, pv);
-      return line;
-    });
+        line.append(no, score, pv);
+        return line;
+      });
 
     el.lines.replaceChildren(...rows);
   }
 
   async function loadEngine() {
     try {
-      worker = new Worker(new URL("./engine/stockfish11.js", window.location.href));
+      const source = await window.cheezie.getEngineSource();
+      const blob = new Blob([source], {
+        type: "application/javascript"
+      });
+
+      worker = new Worker(URL.createObjectURL(blob));
 
       worker.onmessage = (event) => {
         const line = typeof event.data === "string" ? event.data : "";
@@ -107,20 +125,43 @@
 
         if (line.startsWith("info")) {
           const info = parseInfo(line);
-          if (Number.isFinite(info.depth)) el.currentDepth.textContent = String(info.depth);
-          if (Number.isFinite(info.nodes)) el.nodes.textContent = info.nodes.toLocaleString();
-          if (info.score) el.evaluation.textContent = info.score;
+
+          if (Number.isFinite(info.depth)) {
+            el.currentDepth.textContent = String(info.depth);
+          }
+
+          if (Number.isFinite(info.nodes)) {
+            el.nodes.textContent = info.nodes.toLocaleString();
+          }
+
+          if (info.score) {
+            el.evaluation.textContent = info.score;
+          }
+
           lastInfo.set(info.multipv, info);
           renderLines();
           return;
         }
 
         if (line.startsWith("bestmove")) {
-          el.bestmove.textContent = line.trim().split(/\s+/)[1] || "none";
+          el.bestmove.textContent =
+            line.trim().split(/\s+/)[1] || "none";
+
           analyzing = false;
+          analyzingFen = null;
           el.analyze.disabled = false;
           el.stop.disabled = true;
-          setStatus("Ready");
+
+          if (liveMode && queuedFen && queuedFen !== el.fen.value.trim()) {
+            const nextFen = queuedFen;
+            queuedFen = null;
+            el.fen.value = nextFen;
+            startAnalysis(nextFen);
+            return;
+          }
+
+          queuedFen = null;
+          setStatus(liveMode ? "Live: waiting for next move" : "Ready");
           return;
         }
 
@@ -133,7 +174,7 @@
         if (line === "readyok") {
           initialized = true;
           el.analyze.disabled = false;
-          setStatus("Ready");
+          setStatus(liveMode ? "Live: waiting for Chess.com" : "Ready");
           return;
         }
 
@@ -141,7 +182,10 @@
       };
 
       worker.onerror = (event) => {
-        addLog("ENGINE ERROR: " + (event.message || "unknown worker error"));
+        addLog(
+          "ENGINE ERROR: " +
+            (event.message || "unknown worker error")
+        );
         setStatus("Engine error");
         initialized = false;
         analyzing = false;
@@ -150,7 +194,7 @@
       };
 
       worker.postMessage("uci");
-      setStatus("Initializing…");
+      setStatus("Initializing engine…");
     } catch (error) {
       setStatus("Failed to load engine");
       addLog(String(error));
@@ -159,52 +203,178 @@
 
   function sendOptions() {
     if (!worker) return;
-    const multipv = Math.max(1, Math.min(10, Number(el.multipv.value) || 1));
-    const threads = Math.max(1, Math.min(64, Number(el.threads.value) || 1));
-    const hash = Math.max(1, Math.min(4096, Number(el.hash.value) || 128));
+
+    const multipv = Math.max(
+      1,
+      Math.min(10, Number(el.multipv.value) || 1)
+    );
+    const threads = Math.max(
+      1,
+      Math.min(64, Number(el.threads.value) || 1)
+    );
+    const hash = Math.max(
+      1,
+      Math.min(4096, Number(el.hash.value) || 128)
+    );
 
     worker.postMessage("setoption name MultiPV value " + multipv);
     worker.postMessage("setoption name Threads value " + threads);
     worker.postMessage("setoption name Hash value " + hash);
   }
 
-  function analyze() {
-    if (!initialized || !worker || analyzing) return;
-    const fen = el.fen.value.trim();
-    const depth = Math.max(1, Math.min(60, Number(el.depth.value) || 18));
+  function startAnalysis(fen) {
+    if (!initialized || !worker || !fen) return;
 
-    if (!fen) {
-      setStatus("FEN is empty");
-      return;
-    }
+    const depth = Math.max(
+      1,
+      Math.min(60, Number(el.depth.value) || 18)
+    );
 
     resetResults();
     sendOptions();
-    addLog("position fen " + fen);
-
     analyzing = true;
+    analyzingFen = fen;
     el.analyze.disabled = true;
     el.stop.disabled = false;
-    setStatus("Analyzing…");
+
+    setStatus(liveMode ? "Live: analyzing current position…" : "Analyzing…");
+    addLog("position fen " + fen);
 
     worker.postMessage("stop");
     worker.postMessage("position fen " + fen);
     worker.postMessage("go depth " + depth);
   }
 
+  function analyze() {
+    const fen = el.fen.value.trim();
+
+    if (!fen) {
+      setStatus("FEN is empty");
+      return;
+    }
+
+    if (analyzing) {
+      queuedFen = fen;
+      worker.postMessage("stop");
+      return;
+    }
+
+    queuedFen = null;
+    startAnalysis(fen);
+  }
+
   function stop() {
     if (!worker || !analyzing) return;
+
+    queuedFen = null;
     worker.postMessage("stop");
     analyzing = false;
+    analyzingFen = null;
     el.analyze.disabled = false;
     el.stop.disabled = true;
-    setStatus("Stopped");
+    setStatus(liveMode ? "Live: waiting for next move" : "Stopped");
+  }
+
+  function setLiveMode(enabled) {
+    liveMode = enabled;
+    el.liveToggle.textContent = enabled ? "Live: ON" : "Live: OFF";
+    el.liveToggle.classList.toggle("active", enabled);
+
+    if (!enabled) {
+      queuedFen = null;
+      if (analyzing) {
+        worker.postMessage("stop");
+        analyzing = false;
+        analyzingFen = null;
+        el.analyze.disabled = false;
+        el.stop.disabled = true;
+      }
+      setStatus("Ready");
+      return;
+    }
+
+    const fen = el.fen.value.trim();
+    if (initialized && fen) startAnalysis(fen);
+    else setStatus("Live: waiting for Chess.com");
+  }
+
+  function handlePosition(payload) {
+    if (!payload || typeof payload.fen !== "string") return;
+
+    el.fen.value = payload.fen;
+    el.source.textContent = "Chess.com";
+
+    if (!liveMode) {
+      setStatus("Chess.com position received");
+      return;
+    }
+
+    if (payload.isGameOver) {
+      queuedFen = null;
+      if (analyzing) worker.postMessage("stop");
+      analyzing = false;
+      analyzingFen = null;
+      el.analyze.disabled = false;
+      el.stop.disabled = true;
+      setStatus("Chess.com game over");
+      return;
+    }
+
+    if (payload.fen === analyzingFen) return;
+
+    if (analyzing) {
+      queuedFen = payload.fen;
+      worker.postMessage("stop");
+      return;
+    }
+
+    queuedFen = null;
+    startAnalysis(payload.fen);
   }
 
   el.analyze.addEventListener("click", analyze);
   el.stop.addEventListener("click", stop);
-  el.startpos.addEventListener("click", () => { el.fen.value = START_FEN; });
-  el.clear.addEventListener("click", () => { resetResults(); el.log.textContent = ""; });
+
+  el.liveToggle.addEventListener("click", () => {
+    setLiveMode(!liveMode);
+  });
+
+  el.startpos.addEventListener("click", () => {
+    el.fen.value = START_FEN;
+    el.source.textContent = "Manual";
+
+    if (liveMode) {
+      startAnalysis(START_FEN);
+    }
+  });
+
+  el.clear.addEventListener("click", () => {
+    resetResults();
+    el.log.textContent = "";
+    el.source.textContent = "Manual";
+  });
+
+  el.extensionFolder.addEventListener("click", async () => {
+    try {
+      await window.cheezie.openExtensionFolder();
+      setStatus("Bridge folder opened");
+    } catch (error) {
+      setStatus("Could not open bridge folder");
+      addLog(String(error));
+    }
+  });
+
+  window.cheezie.onBridgeStatus((status) => {
+    if (status?.connected && !analyzing) {
+      setStatus(
+        liveMode
+          ? "Live: connected to Chess.com"
+          : "Chess.com bridge connected"
+      );
+    }
+  });
+
+  window.cheezie.onPosition(handlePosition);
 
   loadEngine();
 })();
