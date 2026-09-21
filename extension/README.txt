@@ -1,5 +1,7 @@
 CHEEZIE ENGINE LIVE BRIDGE
 
+This extension is distributed separately from Cheezie Engine for Windows.
+
 Purpose:
 This extension reads the current Chess.com position and sends its FEN to the Cheezie Engine Windows app through Native Messaging.
 
@@ -9,7 +11,7 @@ It does not click pieces.
 It does not make moves.
 
 INSTALL:
-1. Start Cheezie Engine.exe once.
+1. Install and run Cheezie Engine.exe once.
 2. Open your Chromium-based browser.
 3. Open the browser extension management page.
 4. Turn on Developer mode.
@@ -21,4 +23,4 @@ INSTALL:
 SUPPORTED BROWSERS:
 Chrome, Edge, Brave, and Chromium-based browsers using Chromium Native Messaging.
 
-The desktop application registers the native messaging host under the current Windows user account.
+The desktop application registers the Native Messaging host under the current Windows user account.
